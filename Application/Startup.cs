@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Reflection;
 using Application.Database;
 using Application.Helpers;
-using Application.Models;
 using Application.Repositories;
 using Application.Services;
-using Application.Utility;
+using Application.Utility.ClientLibrary;
 using Application.Utility.Database;
 using Application.Utility.Middleware;
+using Application.Utility.Models;
 using Application.Utility.Startup;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
@@ -17,61 +16,77 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using OpenTracing.Util;
 using Prometheus;
-using Serilog;
 
-namespace Application {
-    public class Startup {
-        public Startup (IConfiguration configuration) {
+namespace Application
+{
+    public class Startup
+    {
+        public Startup(IConfiguration configuration, ILoggerFactory loggerFactory)
+        {
+            _loggerFactory = loggerFactory;
             Configuration = configuration;
-            Logging.CreateLogger ();
+            Logging.CreateLogger();
         }
+
+        private readonly ILoggerFactory _loggerFactory;
 
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices (IServiceCollection services) {
+        public void ConfigureServices(IServiceCollection services)
+        {
             // Set compability mode for mvc
-            services.AddMvc ().SetCompatibilityVersion (CompatibilityVersion.Version_2_2)
-                .AddJsonOptions (options => {
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddJsonOptions(options =>
+                {
                     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                 });
 
-            services.AddSingleton<IDatabaseSettings, DatabaseSettings> ();
-            services.AddTransient<IDatabaseContext, DatabaseContext> ();
-            services.AddMongoDb ();
-            services.AddAutoMapper (typeof (AutoMapperProfile));
+            services.AddSingleton<IDatabaseSettings, DatabaseSettings>();
+            services.AddTransient<IDatabaseContext, DatabaseContext>();
+            services.AddMongoDb();
+            services.AddAutoMapper(typeof(AutoMapperProfile));
+            
+            services.AddHttpClient();
+            services.AddTransient<IClient, Client>();
+            
+            services.AddMultipleDomainSupport();
 
-            services.AddMultipleDomainSupport ();
+            var appSettings = Configuration.GetSection("AppSettings").Get<AppSettings>();
+            services.AddTokenValidation(appSettings.Secret);
+            services.AddScoped<IProjectRepository, ProjectRepository>();
+            services.AddScoped<IProjectService, ProjectService>();
+            services.AddTracing(options =>
+            {
+                options.JaegerAgentHost = Environment.GetEnvironmentVariable("JAEGER_AGENT_HOST");
+                options.ServiceName = "projects-service";
+                options.LoggerFactory = _loggerFactory;
+            });
 
-            var appSettings = Settings.GetAppSettings (services, Configuration);
-            services.AddTokenValidation (appSettings.Secret);
-            services.AddScoped<IProjectRepository, ProjectRepository> ();
-            services.AddScoped<IProjectService, ProjectService> ();
+            services.AddApiDocumentation("Projects");
 
-            services.AddApiDocumentation ("Project");
-
-            services.AddHealthChecks ();
+            services.AddHealthChecks();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure (IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory) {
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        {
             // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-            app.UseHsts ();
-            app.UseHttpsRedirection ();
+            app.UseHsts();
+            app.UseHttpsRedirection();
 
-            loggerFactory.AddLogging ();
+            loggerFactory.AddLogging();
 
-            app.UseMultipleDomainSupport ();
-            app.UseHealthChecks ("/api/health");
-            app.UseMetricServer ();
-            app.UseRequestMiddleware ();
+            app.UseMultipleDomainSupport();
+            app.UseHealthChecks("/api/health");
+            app.UseMetricServer();
+            app.UseRequestMiddleware();
 
-            app.UseAuthentication ();
-            app.UseApiDocumentation ("Project");
+            app.UseAuthentication();
+            app.UseApiDocumentation("Projects");
 
-            app.UseMvc ();
+            app.UseMvc();
         }
     }
 }
