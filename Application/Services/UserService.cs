@@ -2,45 +2,39 @@ using System;
 using Application.Models.Entities;
 using Application.Repositories;
 
-namespace Application.Services
-{
-    public interface IUserService
-    {
-        User Create(User user);
-        void Update(User userParam);
+namespace Application.Services {
+    public interface IProjectService {
+        Project Create (Project project);
+        void Update (Project projectParam);
     }
 
-    public class UserService : IUserService
-    {
-        private readonly IUserRepository _userRepository;
+    public class ProjectService : IProjectService {
+        private readonly IProjectRepository _projectRepository;
 
-        public UserService(IUserRepository userRepository)
-        {
-            _userRepository = userRepository;
+        public ProjectService (IProjectRepository projectRepository) {
+            _projectRepository = projectRepository;
         }
 
-        public User Create(User user)
-        {
-            if (_userRepository.GetByEmail(user.Email) != null)
-                throw new Exception("Email is already taken");
+        public Project Create (Project project) {
+            if (_projectRepository.GetByEmail (project.Email) != null)
+                throw new Exception ("Email is already taken");
 
-            return _userRepository.Create(user);
+            return _projectRepository.Create (project);
         }
 
-        public void Update(User userParam)
-        {
-            var user = _userRepository.GetById(userParam.Id) ??
-                       throw new ArgumentNullException("_userRepository.GetById(userParam.Id)");
+        public void Update (Project projectParam) {
+            var project = _projectRepository.GetById (projectParam.Id) ??
+                throw new ArgumentNullException ("_projectRepository.GetById(projectParam.Id)");
 
-            if (userParam.Email != user.Email)
-                if (_userRepository.GetByEmail(userParam.Email) != null)
-                    throw new Exception("Email was already taken");
+            if (projectParam.Email != project.Email)
+                if (_projectRepository.GetByEmail (projectParam.Email) != null)
+                    throw new Exception ("Email was already taken");
 
-            user.FirstName = userParam.FirstName;
-            user.LastName = userParam.LastName;
-            user.Email = userParam.Email;
+            project.FirstName = projectParam.FirstName;
+            project.LastName = projectParam.LastName;
+            project.Email = projectParam.Email;
 
-            _userRepository.Update(user.Id, user);
+            _projectRepository.Update (project.Id, project);
         }
     }
 }

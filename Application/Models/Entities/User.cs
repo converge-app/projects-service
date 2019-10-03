@@ -2,12 +2,10 @@ using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Application.Models.Entities
-{
-    public class User
-    {
+namespace Application.Models.Entities {
+    public class Project {
         [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
+        [BsonRepresentation (BsonType.ObjectId)]
         public string Id { get; set; }
 
         public string FirstName { get; set; }

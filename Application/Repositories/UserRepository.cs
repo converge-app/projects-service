@@ -3,64 +3,53 @@ using Application.Database;
 using Application.Models.Entities;
 using MongoDB.Driver;
 
-namespace Application.Repositories
-{
-    public interface IUserRepository
-    {
-        List<User> Get();
-        User GetById(string id);
-        User GetByEmail(string email);
-        User Create(User user);
-        void Update(string id, User userIn);
-        void Remove(User userIn);
-        void Remove(string id);
+namespace Application.Repositories {
+    public interface IProjectRepository {
+        List<Project> Get ();
+        Project GetById (string id);
+        Project GetByEmail (string email);
+        Project Create (Project project);
+        void Update (string id, Project projectIn);
+        void Remove (Project projectIn);
+        void Remove (string id);
     }
 
-    public class UserRepository : IUserRepository
-    {
+    public class ProjectRepository : IProjectRepository {
         private readonly IDatabaseContext dbContext;
-        private readonly IMongoCollection<User> _users;
+        private readonly IMongoCollection<Project> _projects;
 
-        public UserRepository(IDatabaseContext dbContext)
-        {
+        public ProjectRepository (IDatabaseContext dbContext) {
             this.dbContext = dbContext;
-            if (dbContext.IsConnectionOpen()) _users = dbContext.Users;
+            if (dbContext.IsConnectionOpen ()) _projects = dbContext.Projects;
         }
 
-        public List<User> Get()
-        {
-            return _users.Find(user => true).ToList();
+        public List<Project> Get () {
+            return _projects.Find (project => true).ToList ();
         }
 
-        public User GetById(string id)
-        {
-            return _users.Find(user => user.Id == id).FirstOrDefault();
+        public Project GetById (string id) {
+            return _projects.Find (project => project.Id == id).FirstOrDefault ();
         }
 
-        public User GetByEmail(string email)
-        {
-            return _users.Find(user => user.Email == email).FirstOrDefault();
+        public Project GetByEmail (string email) {
+            return _projects.Find (project => project.Email == email).FirstOrDefault ();
         }
 
-        public User Create(User user)
-        {
-            _users.InsertOne(user);
-            return user;
+        public Project Create (Project project) {
+            _projects.InsertOne (project);
+            return project;
         }
 
-        public void Update(string id, User userIn)
-        {
-            _users.ReplaceOne(user => user.Id == id, userIn);
+        public void Update (string id, Project projectIn) {
+            _projects.ReplaceOne (project => project.Id == id, projectIn);
         }
 
-        public void Remove(User userIn)
-        {
-            _users.DeleteOne(user => user.Id == userIn.Id);
+        public void Remove (Project projectIn) {
+            _projects.DeleteOne (project => project.Id == projectIn.Id);
         }
 
-        public void Remove(string id)
-        {
-            _users.DeleteOne(user => user.Id == id);
+        public void Remove (string id) {
+            _projects.DeleteOne (project => project.Id == id);
         }
     }
 }
