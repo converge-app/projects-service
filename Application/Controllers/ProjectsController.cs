@@ -20,30 +20,31 @@ namespace Application.Controllers
 {
     [Route("api/[controller]")]
     [Authorize]
-    public class BiddingsController : ControllerBase
+    public class ProjectsController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly IBiddingRepository _biddingRepository;
-        private readonly IBiddingService _biddingService;
+        private readonly IProjectRepository _projectRepository;
+        private readonly IProjectService _projectService;
 
-        public BiddingsController(IBiddingService biddingService, IBiddingRepository biddingRepository, IMapper mapper)
+        public ProjectsController(IProjectService projectService, IProjectRepository projectRepository, IMapper mapper)
         {
-            _biddingService = biddingService;
-            _biddingRepository = biddingRepository;
+            _projectService = projectService;
+            _projectRepository = projectRepository;
             _mapper = mapper;
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateBidding([FromBody] BiddingCreationDto biddingDto)
+        public async Task<IActionResult> CreateProject([FromBody] ProjectCreationDto projectDto)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new { message = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                return BadRequest(new
+                    {message = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)});
 
-            var createBidding = _mapper.Map<Bidding>(biddingDto);
+            var createProject = _mapper.Map<Project>(projectDto);
             try
             {
-                var createdBidding = await _biddingService.Create(createBidding);
-                return Ok(createdBidding);
+                var createdProject = await _projectService.Create(createProject);
+                return Ok(createdProject);
             }
             catch (UserNotFound)
             {
@@ -63,47 +64,48 @@ namespace Application.Controllers
         [AllowAnonymous]
         public IActionResult GetAll()
         {
-            var biddings = _biddingRepository.Get();
-            var biddingDtos = _mapper.Map<IList<BiddingDto>>(biddings);
-            return Ok(biddingDtos);
+            var projects = _projectRepository.Get();
+            var projectDtos = _mapper.Map<IList<ProjectDto>>(projects);
+            return Ok(projectDtos);
         }
 
         [HttpGet("employer/{id}")]
         [AllowAnonymous]
         public IActionResult GetByOwnerId(string id)
         {
-            var bidding = _biddingRepository.GetByOwnerId(id);
-            var biddingDto = _mapper.Map<BiddingDto>(bidding);
-            return Ok(biddingDto);
+            var project = _projectRepository.GetByOwnerId(id);
+            var projectDto = _mapper.Map<ProjectDto>(project);
+            return Ok(projectDto);
         }
 
         [HttpGet("freelancer/{id}")]
         [AllowAnonymous]
         public IActionResult GetByFreelancerId(string id)
         {
-            var bidding = _biddingRepository.GetByFreelancerId(id);
-            var biddingDto = _mapper.Map<BiddingDto>(bidding);
-            return Ok(biddingDto);
+            var project = _projectRepository.GetByFreelancerId(id);
+            var projectDto = _mapper.Map<ProjectDto>(project);
+            return Ok(projectDto);
         }
+
 
         [HttpGet("{id}")]
         [AllowAnonymous]
         public IActionResult GetById(string id)
         {
-            var bidding = _biddingRepository.GetById(id);
-            var biddingDto = _mapper.Map<BiddingDto>(bidding);
-            return Ok(biddingDto);
+            var project = _projectRepository.GetById(id);
+            var projectDto = _mapper.Map<ProjectDto>(project);
+            return Ok(projectDto);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update([FromRoute] string id, [FromBody] BiddingUpdateDto biddingDto)
+        public IActionResult Update([FromRoute] string id, [FromBody] ProjectUpdateDto projectDto)
         {
-            var bidding = _mapper.Map<Bidding>(biddingDto);
-            bidding.Id = id;
+            var project = _mapper.Map<Project>(projectDto);
+            project.Id = id;
 
             try
             {
-                _biddingService.Update(bidding);
+                _projectService.Update(project);
                 return Ok();
             }
             catch (Exception e)
@@ -117,7 +119,7 @@ namespace Application.Controllers
         {
             try
             {
-                _biddingRepository.Remove(id);
+                _projectRepository.Remove(id);
             }
             catch (Exception e)
             {

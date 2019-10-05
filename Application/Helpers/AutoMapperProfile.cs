@@ -8,12 +8,12 @@ namespace Application.Helpers
     {
         public AutoMapperProfile()
         {
-            CreateMap<Bidding, BiddingDto>();
-            CreateMap<BiddingDto, Bidding>();
-            CreateMap<BiddingUpdateDto, Bidding>();
-            CreateMap<BiddingCreationDto, Bidding>();
-            CreateMap<BiddingContentDto, BiddingContent>();
-            CreateMap<BiddingContent, BiddingContentDto>();
+            CreateMap<Project, ProjectDto>();
+            CreateMap<ProjectDto, Project>();
+            CreateMap<ProjectUpdateDto, Project>();
+            CreateMap<ProjectCreationDto, Project>();
+            CreateMap<ProjectContentDto, ProjectContent>();
+            CreateMap<ProjectContent, ProjectContentDto>();
         }
     }
 }

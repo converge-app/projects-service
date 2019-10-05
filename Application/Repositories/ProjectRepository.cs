@@ -5,68 +5,68 @@ using MongoDB.Driver;
 
 namespace Application.Repositories
 {
-    public interface IBiddingRepository
+    public interface IProjectRepository
     {
-        List<Bidding> Get();
-        Bidding GetById(string id);
-        Bidding GetByOwnerId(string ownerId);
-        Bidding GetByFreelancerId(string freelancerId);
-        Bidding Create(Bidding bidding);
-        void Update(string id, Bidding biddingIn);
-        void Remove(Bidding biddingIn);
+        List<Project> Get();
+        Project GetById(string id);
+        Project GetByOwnerId(string ownerId);
+        Project GetByFreelancerId(string freelancerId);
+        Project Create(Project project);
+        void Update(string id, Project projectIn);
+        void Remove(Project projectIn);
         void Remove(string id);
     }
 
-    public class BiddingRepository : IBiddingRepository
+    public class ProjectRepository : IProjectRepository
     {
         private readonly IDatabaseContext dbContext;
-        private readonly IMongoCollection<Bidding> _biddings;
+        private readonly IMongoCollection<Project> _projects;
 
-        public BiddingRepository(IDatabaseContext dbContext)
+        public ProjectRepository(IDatabaseContext dbContext)
         {
             this.dbContext = dbContext;
-            if (dbContext.IsConnectionOpen()) _biddings = dbContext.Biddings;
+            if (dbContext.IsConnectionOpen()) _projects = dbContext.Projects;
         }
 
-        public List<Bidding> Get()
+        public List<Project> Get()
         {
-            return _biddings.Find(bidding => true).ToList();
+            return _projects.Find(project => true).ToList();
         }
 
-        public Bidding GetById(string id)
+        public Project GetById(string id)
         {
-            return _biddings.Find(bidding => bidding.Id == id).FirstOrDefault();
+            return _projects.Find(project => project.Id == id).FirstOrDefault();
         }
 
-        public Bidding GetByOwnerId(string ownerId)
+        public Project GetByOwnerId(string ownerId)
         {
-            return _biddings.Find(bidding => bidding.OwnerId == ownerId).FirstOrDefault();
+            return _projects.Find(project => project.OwnerId == ownerId).FirstOrDefault();
         }
 
-        public Bidding GetByFreelancerId(string freelancerId)
+        public Project GetByFreelancerId(string freelancerId)
         {
-            return _biddings.Find(bidding => bidding.FreelancerId == freelancerId).FirstOrDefault();
+            return _projects.Find(project => project.FreelancerId == freelancerId).FirstOrDefault();
         }
 
-        public Bidding Create(Bidding bidding)
+        public Project Create(Project project)
         {
-            _biddings.InsertOne(bidding);
-            return bidding;
+            _projects.InsertOne(project);
+            return project;
         }
 
-        public void Update(string id, Bidding biddingIn)
+        public void Update(string id, Project projectIn)
         {
-            _biddings.ReplaceOne(bidding => bidding.Id == id, biddingIn);
+            _projects.ReplaceOne(project => project.Id == id, projectIn);
         }
 
-        public void Remove(Bidding biddingIn)
+        public void Remove(Project projectIn)
         {
-            _biddings.DeleteOne(bidding => bidding.Id == biddingIn.Id);
+            _projects.DeleteOne(project => project.Id == projectIn.Id);
         }
 
         public void Remove(string id)
         {
-            _biddings.DeleteOne(bidding => bidding.Id == id);
+            _projects.DeleteOne(project => project.Id == id);
         }
     }
 }

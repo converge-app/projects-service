@@ -11,48 +11,49 @@ using Application.Utility.Models;
 
 namespace Application.Services
 {
-    public interface IBiddingService
+    public interface IProjectService
     {
-        Task<Bidding> Create(Bidding bidding);
-        void Update(Bidding biddingParam);
+        Task<Project> Create(Project project);
+        void Update(Project projectParam);
     }
 
-    public class BiddingService : IBiddingService
+    public class ProjectService : IProjectService
     {
-        private readonly IBiddingRepository _biddingRepository;
+        private readonly IProjectRepository _projectRepository;
         private readonly IClient _client;
 
-        public BiddingService(IBiddingRepository biddingRepository, IClient client)
+        public ProjectService(IProjectRepository projectRepository, IClient client)
         {
-            _biddingRepository = biddingRepository;
+            _projectRepository = projectRepository;
             _client = client;
         }
 
-        public async Task<Bidding> Create(Bidding bidding)
+        public async Task<Project> Create(Project project)
         {
-            if (bidding == null)
-                throw new InvalidBidding();
+            if (project == null)
+                throw new InvalidProject();
             // Find if owner exists
-            var user = await _client.GetUserAsync(bidding.OwnerId);
+            var user = await _client.GetUserAsync(project.OwnerId);
             if (user != null)
             {
-                var createdBidding = _biddingRepository.Create(bidding);
-                if (createdBidding != null)
-                    return createdBidding;
-                throw new InvalidBidding("Could not create bidding");
+                var createdProject = _projectRepository.Create(project);
+                if (createdProject != null)
+                    return createdProject;
+                throw new InvalidProject("Could not create project");
             }
 
             throw new UserNotFound();
         }
 
-        public void Update(Bidding bidding)
-        {
-            if (bidding == null)
-                throw new InvalidBidding();
 
-            if (_biddingRepository.GetById(bidding.Id) != null);
+        public void Update(Project project)
+        {
+            if (project == null)
+                throw new InvalidProject();
+
+            if (_projectRepository.GetById(project.Id) != null) ;
             {
-                _biddingRepository.Update(bidding.Id, bidding);
+                _projectRepository.Update(project.Id, project);
             }
         }
     }

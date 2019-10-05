@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Application.Models.Entities
 {
-    public class BiddingContent
+    public class ProjectContent
     {
         [BsonRequired]
         public string Title { get; set; }
