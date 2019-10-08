@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Application.Database;
 using Application.Models.Entities;
 using MongoDB.Driver;
@@ -15,6 +16,7 @@ namespace Application.Repositories
         void Update(string id, Project projectIn);
         void Remove(Project projectIn);
         void Remove(string id);
+        Task<List<Project>> GetAllFreelancerIsNull();
     }
 
     public class ProjectRepository : IProjectRepository
@@ -67,6 +69,11 @@ namespace Application.Repositories
         public void Remove(string id)
         {
             _projects.DeleteOne(project => project.Id == id);
+        }
+
+        public async Task<List<Project>> GetAllFreelancerIsNull()
+        {
+            return await (await _projects.FindAsync(project => project.FreelancerId == null)).ToListAsync();
         }
     }
 }

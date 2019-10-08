@@ -87,6 +87,15 @@ namespace Application.Controllers
             return Ok(projectDto);
         }
 
+        [HttpGet("open")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetOpen()
+        {
+            var projects = await _projectRepository.GetAllFreelancerIsNull();
+            var projectDtos = _mapper.Map<ProjectDto>(projects);
+            return Ok(projectDtos);
+        }
+
 
         [HttpGet("{id}")]
         [AllowAnonymous]
