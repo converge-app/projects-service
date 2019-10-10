@@ -23,6 +23,7 @@
       "launchUrl": "api/health/ping",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
+        "HTTP_PORT": "8080",
         "USERS_SERVICE_HTTP": "users-service.api.converge-app.net"
       },
       "applicationUrl": "https://localhost:443;http://localhost:80"

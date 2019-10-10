@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Application.Models.DataTransferObjects;
 using Application.Models.Entities;
 using AutoMapper;
@@ -14,6 +15,8 @@ namespace Application.Helpers
             CreateMap<ProjectCreationDto, Project>();
             CreateMap<ProjectContentDto, ProjectContent>();
             CreateMap<ProjectContent, ProjectContentDto>();
+            CreateMap<List<Project>, List<ProjectDto>>();
+            CreateMap<List<ProjectDto>, List<Project>>();
         }
     }
 }

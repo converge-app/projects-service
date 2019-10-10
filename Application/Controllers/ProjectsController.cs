@@ -92,7 +92,7 @@ namespace Application.Controllers
         public async Task<IActionResult> GetOpen()
         {
             var projects = await _projectRepository.GetAllFreelancerIsNull();
-            var projectDtos = _mapper.Map<ProjectDto>(projects);
+            var projectDtos = _mapper.Map<IList<ProjectDto>>(projects);
             return Ok(projectDtos);
         }
 
