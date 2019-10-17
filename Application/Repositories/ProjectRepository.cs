@@ -17,6 +17,7 @@ namespace Application.Repositories
         void Remove(Project projectIn);
         void Remove(string id);
         Task<List<Project>> GetAllFreelancerIsNull();
+        Task<List<Project>> getByUser(string userId);
     }
 
     public class ProjectRepository : IProjectRepository
@@ -27,7 +28,7 @@ namespace Application.Repositories
         public ProjectRepository(IDatabaseContext dbContext)
         {
             this.dbContext = dbContext;
-            if (dbContext.IsConnectionOpen()) _projects = dbContext.Projects;
+            if (dbContext.IsConnectionOpen())_projects = dbContext.Projects;
         }
 
         public List<Project> Get()
@@ -75,5 +76,8 @@ namespace Application.Repositories
         {
             return await (await _projects.FindAsync(project => project.FreelancerId == null)).ToListAsync();
         }
+
+        public async Task<List<Project>> getByUser(string userId) => await (await _projects.FindAsync(project => project.OwnerId == userId || project.FreelancerId == userId)).ToListAsync();
+
     }
 }

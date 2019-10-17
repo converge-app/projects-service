@@ -37,8 +37,7 @@ namespace Application.Controllers
         public async Task<IActionResult> CreateProject([FromBody] ProjectCreationDto projectDto)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new
-                    {message = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)});
+                return BadRequest(new { message = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
 
             var createProject = _mapper.Map<Project>(projectDto);
             try
@@ -87,6 +86,15 @@ namespace Application.Controllers
             return Ok(projectDto);
         }
 
+        [HttpGet("user/{userId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetByUser([FromRoute] string userId)
+        {
+            List<Project> projects = await _projectRepository.getByUser(userId);
+            var projectDtos = _mapper.Map<IList<ProjectDto>>(projects);
+            return Ok(projectDtos);
+        }
+
         [HttpGet("open")]
         [AllowAnonymous]
         public async Task<IActionResult> GetOpen()
@@ -95,7 +103,6 @@ namespace Application.Controllers
             var projectDtos = _mapper.Map<IList<ProjectDto>>(projects);
             return Ok(projectDtos);
         }
-
 
         [HttpGet("{id}")]
         [AllowAnonymous]
