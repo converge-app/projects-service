@@ -1,4 +1,9 @@
-﻿using Application.Exceptions;
+﻿
+using System.Net;
+using System.Net.Http;
+
+using Application.Exceptions;
+using Application.Models.DataTransferObjects;
 using Application.Models.Entities;
 using Application.Repositories;
 using Application.Services;
@@ -23,6 +28,68 @@ namespace ApplicationUnitTests
             // Assert
             Assert.ThrowsAsync<InvalidProject>(() => projectService.Create(new Project()));
         }
+
+        [Fact]
+        public async void Create_GetUserAsync()
+        {
+            var handler = new Mock<MockHandler>();
+            handler.Setup(m => m.SendAsync(HttpMethod.Get, "https://projects-service.api.converge-app.net/api/Health/ping"))
+            .Returns(() => Success("pong"));
+
+            using (var client = new HttpClient())
+            {
+                var response = await client.GetAsync("https://projects-service.api.converge-app.net/api/Health/ping");
+
+                Assert.Equal("pong", "pong");
+            }
+
+        }
+        private static HttpResponseMessage Success(string content)
+        {
+            var response = new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+            response.Content = new StringContent(content);
+
+            return response;
+        }
+
+        [Fact]
+        public void Create_createdProjectl_ReturnsOwnerId()
+        {
+            // Arrange
+            var projectRepository = new Mock<IProjectRepository>();
+            var client = new Mock<IClient>();
+            projectRepository.Setup(m => m.Create(It.IsAny<Project>())).Returns(new Project());
+            var projectService = new ProjectService(projectRepository.Object, client.Object);
+
+            // Act
+            var project = projectService.Create(new Project());
+            // Assert
+            Assert.NotNull(project);
+
+        }
+
+        [Fact]
+        public void Create_createdProject_ReturnsContent()
+        {
+            // Arrange
+            var projectRepository = new Mock<IProjectRepository>();
+            var client = new Mock<IClient>();
+            projectRepository.Setup(m => m.Create(It.IsAny<Project>()))
+            .Returns(new Project());
+            var projectService = new ProjectService(projectRepository.Object, client.Object);
+
+            // Act
+            var sa = new ProjectContentDto();
+            var actual = projectService.Create(new Project());
+            // Assert
+            Assert.Equal(new ProjectContentDto().Title, sa.Title);
+
+        }
+
+
+
+
+
 
         [Fact]
         public void Update_ProjectIsNull_ThrowsInvalidProject()
