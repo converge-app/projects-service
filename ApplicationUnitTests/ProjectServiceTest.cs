@@ -86,7 +86,18 @@ namespace ApplicationUnitTests
 
         }
 
+        public void Create_CouldNotCreateProject_ThrowsInvalidProject()
+        {
+            // Arrange
+            var projectRepository = new Mock<IProjectRepository>();
+            var client = new Mock<IClient>();
+            projectRepository.Setup(m => m.Create(It.IsAny<Project>())).Returns((Project)null);
+            var projectService = new ProjectService(projectRepository.Object, client.Object);
 
+            // Act
+            // Assert
+            Assert.ThrowsAsync<InvalidProject>(() => projectService.Create(new Project()));
+        }
 
 
 
