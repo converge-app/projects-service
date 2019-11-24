@@ -1,7 +1,8 @@
-﻿
+﻿using System;
 using System.Net;
 using System.Net.Http;
-
+using System.Threading.Tasks;
+using System.Web.Http;
 using Application.Exceptions;
 using Application.Models.DataTransferObjects;
 using Application.Models.Entities;
@@ -32,25 +33,31 @@ namespace ApplicationUnitTests
         [Fact]
         public async void Create_GetUserAsync()
         {
-            var handler = new Mock<MockHandler>();
-            handler.Setup(m => m.SendAsync(HttpMethod.Get, "https://projects-service.api.converge-app.net/api/Health/ping"))
-            .Returns(() => Success("pong"));
-
-            using (var client = new HttpClient())
+            Environment.SetEnvironmentVariable("USERS_SERVICE_HTTP", "users-service.api.converge-app.net");
+            var expected = "";
+            var mockFactory = new Mock<IHttpClientFactory>();
+            var configuration = new HttpConfiguration();
+            var clientHandlerStub = new DelegatingHandlerStub((request, cancellationToken) =>
             {
-                var response = await client.GetAsync("https://projects-service.api.converge-app.net/api/Health/ping");
+                request.SetConfiguration(configuration);
+                var response = request.CreateResponse(HttpStatusCode.OK, expected);
+                return Task.FromResult(response);
+            });
 
-                Assert.Equal("pong", "pong");
-            }
+            var client = new HttpClient(clientHandlerStub);
 
+            mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(client);
+
+            IHttpClientFactory factory = mockFactory.Object;
+            var controller = new Client(factory);
+
+            //Act
+            var result = await controller.GetUserAsync("123");
+
+            //Assert
+            Assert.NotNull(expected);
         }
-        private static HttpResponseMessage Success(string content)
-        {
-            var response = new HttpResponseMessage(System.Net.HttpStatusCode.OK);
-            response.Content = new StringContent(content);
 
-            return response;
-        }
 
         [Fact]
         public void Create_createdProjectl_ReturnsOwnerId()
