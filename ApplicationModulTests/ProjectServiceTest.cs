@@ -8,7 +8,6 @@ using Application.Models.DataTransferObjects;
 using Application.Models.Entities;
 using Application.Utility.ClientLibrary.Project;
 using Application.Utility.Models;
-using Application.Utility.TestUtility;
 using ApplicationModulTests.TestUtility;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Moq;
